@@ -1,0 +1,9 @@
+{
+    "firstName" : "Siddharth",
+    "lastName" : "Kothari",
+    "age": 22,
+    "gender": "M",
+    "email": "siddharth.kothari@company.com",
+    "phoneNo": "9876543210",
+    "department": "Engineering"
+}

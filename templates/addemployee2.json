@@ -1,0 +1,9 @@
+{
+    "firstName" : "Tanaz",
+    "lastName" : "Asha",
+    "age": 25,
+    "gender": "F",
+    "email": "tanaz.asha@company.com",
+    "phoneNo": "9878478498",
+    "department": "HR"
+}

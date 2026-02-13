@@ -1,0 +1,9 @@
+{
+    "firstName" : "admin1",
+    "lastName" : null,
+    "age": null,
+    "gender": null,
+    "email": "admin1@company.com",
+    "phoneNo": null,
+    "department": "Admin"
+}
