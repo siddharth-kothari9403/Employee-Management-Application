@@ -3,7 +3,6 @@ package com.example.employee_management.service;
 import com.example.employee_management.entity.Role;
 import com.example.employee_management.entity.User;
 import com.example.employee_management.exceptions.UserNotFoundException;
-import com.example.employee_management.model.CustomUserDetails;
 import com.example.employee_management.model.UserDTO;
 import com.example.employee_management.repository.RoleRepository;
 import com.example.employee_management.repository.UserRepository;
@@ -13,8 +12,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.core.userdetails.UserDetails;
-
 import java.util.Optional;
 import java.util.Set;
 

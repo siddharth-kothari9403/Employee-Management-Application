@@ -3,12 +3,9 @@ from mysql.connector import Error
 import pandas as pd
 import smtplib
 from email.mime.text import MIMEText
-from email.mime.base import MIMEBase
-from email import encoders
 from email.mime.multipart import MIMEMultipart
 from datetime import date
 from sqlalchemy import create_engine
-import io
 from dotenv import load_dotenv
 import os
 import matplotlib.pyplot as plt
@@ -143,10 +140,6 @@ def generate_report(db_host, db_port, db_name, db_username, db_password, monday_
         return None, None
     
 def send_email(sender_email, receiver_email, password, files=None):
-
-    indiv_df = pd.read_csv('daily_report.csv')
-    dept_df = pd.read_csv('department_report.csv')
-    emp_df = pd.read_csv('employee_report.csv')
 
     message = MIMEMultipart("alternative")
     message["Subject"] = f"Company Productivity Report: {date.today()}"

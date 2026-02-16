@@ -4,7 +4,6 @@ import com.example.employee_management.config.JwtTokenUtil;
 import com.example.employee_management.entity.EmployeeDetails;
 import com.example.employee_management.entity.Role;
 import com.example.employee_management.entity.User;
-import com.example.employee_management.model.CustomUserDetails;
 import com.example.employee_management.model.UserDTO;
 import com.example.employee_management.repository.EmployeeRepository;
 import com.example.employee_management.repository.UserRepository;
