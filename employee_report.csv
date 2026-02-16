@@ -1,27 +1,26 @@
-First Name,Last Name,Department,Duration,Employee Total Hours
-Admin,Admin,Admin,1 days 16:58:50,40.98
-Aleena,Ramirez,Sales,1 days 15:14:30,39.24
-Aliza,Andrews,Marketing,1 days 16:25:30,40.42
-Axton,Benitez,Sales,1 days 17:06:00,41.1
-Blaise,Decker,Engineering,1 days 15:59:22,39.99
-Brynlee,Huber,Marketing,1 days 17:05:38,41.09
-David,Bean,Marketing,1 days 17:10:30,41.17
-Harlem,Montes,Marketing,1 days 16:14:41,40.24
-Harvey,Morton,HR,1 days 16:15:49,40.26
-Heaven,McConnell,HR,1 days 15:55:34,39.93
-Jenesis,Mullen,Product,1 days 17:49:30,41.83
-Jerry,Erickson,Engineering,1 days 17:24:41,41.41
-Kairi,McCarty,Sales,1 days 17:00:30,41.01
-Lexi,Parra,HR,1 days 17:14:52,41.25
-London,Haynes,HR,1 days 17:00:41,41.01
-Lukas,Morse,Product,1 days 17:54:20,41.91
-Mac,Booth,Product,1 days 17:35:27,41.59
-Mallory,Ball,Engineering,1 days 15:04:52,39.08
-Olive,Francis,HR,1 days 16:14:43,40.25
-Raelynn,Best,Product,1 days 17:09:29,41.16
-Roselyn,Copeland,Engineering,1 days 17:50:30,41.84
-Sabrina,Rangel,Sales,1 days 16:45:30,40.76
-Saint,Russell,Marketing,1 days 16:04:07,40.07
-Shane,Soto,Sales,1 days 15:49:38,39.83
-Siddharth,Kothari,Engineering,0 days 08:30:00,8.5
-Zariyah,Wilcox,Engineering,1 days 15:20:17,39.34
+First Name,Last Name,Department,Employee Total Hours
+Admin,Admin,Admin,40.98
+Aleena,Ramirez,Sales,39.24
+Aliza,Andrews,Marketing,40.42
+Axton,Benitez,Sales,41.1
+Blaise,Decker,Engineering,39.99
+Brynlee,Huber,Marketing,41.09
+David,Bean,Marketing,41.17
+Harlem,Montes,Marketing,40.24
+Harvey,Morton,HR,40.26
+Heaven,McConnell,HR,39.93
+Jenesis,Mullen,Product,41.83
+Jerry,Erickson,Engineering,41.41
+Kairi,McCarty,Sales,41.01
+Lexi,Parra,HR,41.25
+London,Haynes,HR,41.01
+Lukas,Morse,Product,41.91
+Mac,Booth,Product,41.59
+Mallory,Ball,Engineering,39.08
+Olive,Francis,HR,40.25
+Raelynn,Best,Product,41.16
+Roselyn,Copeland,Engineering,41.84
+Sabrina,Rangel,Sales,40.76
+Saint,Russell,Marketing,40.07
+Shane,Soto,Sales,39.83
+Zariyah,Wilcox,Engineering,39.34

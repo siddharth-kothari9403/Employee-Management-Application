@@ -50,66 +50,23 @@ public class LoginLogoutTimesServiceTest {
     @BeforeEach
     public void setUp(){
 
-        this.employeeDetails1 = new EmployeeDetails();
-        this.employeeDetails1.setId(1);
-        this.employeeDetails1.setDepartment("Engineering");
+        this.employeeDetails1 = new EmployeeDetails(1, "employee1", null, null, null, null, null, "Engineering");
+        EmployeeDetails employeeDetails2 = new EmployeeDetails(2, "employee2", null, null, null, null, null, "HR");
+        EmployeeDetails employeeDetails3 = new EmployeeDetails(3,  "employee3", null, null, null, null, null, "Engineering");
 
-        EmployeeDetails employeeDetails2 = new EmployeeDetails();
-        employeeDetails2.setId(2);
-        employeeDetails2.setDepartment("HR");
+        this.loginLogoutTimes1 = new LoginLogoutTimes(1, Date.valueOf("2024-05-09"), Time.valueOf("08:45:00"), EntryType.login, employeeDetails1);
+        this.loginLogoutTimes2 = new LoginLogoutTimes(2, Date.valueOf("2024-05-09"), Time.valueOf("09:15:00"),  EntryType.logout, employeeDetails1);
+        this.loginLogoutTimes3 = new LoginLogoutTimes(3, Date.valueOf("2024-05-09"), Time.valueOf("09:15:00"), EntryType.login, employeeDetails2);
+        this.loginLogoutTimes4 = new LoginLogoutTimes(4, Date.valueOf("2024-05-09"), Time.valueOf("08:30:00"), EntryType.login, employeeDetails3);
 
-        EmployeeDetails employeeDetails3 = new EmployeeDetails();
-        employeeDetails3.setId(3);
-        employeeDetails3.setDepartment("Engineering");
-
-        this.loginLogoutTimesList = new ArrayList<>();
-        this.employeeLoginLogoutTimesList = new ArrayList<>();
-        this.engineeringLoginLogoutTimesList = new ArrayList<>();
-
-        this.loginLogoutTimes1 = new LoginLogoutTimes();
-        loginLogoutTimes1.setEntryType(EntryType.login);
-        loginLogoutTimes1.setTime(Time.valueOf("08:45:00"));
-        loginLogoutTimes1.setDate(Date.valueOf("2024-05-09"));
-        loginLogoutTimes1.setEmployeeDetails(employeeDetails1);
-        loginLogoutTimes1.setEntry_id(1);
-
-        loginLogoutTimesList.add(loginLogoutTimes1);
-        employeeLoginLogoutTimesList.add(loginLogoutTimes1);
-        engineeringLoginLogoutTimesList.add(loginLogoutTimes1);
-
-        this.loginLogoutTimes2 = new LoginLogoutTimes();
-        loginLogoutTimes2.setEntryType(EntryType.logout);
-        loginLogoutTimes2.setTime(Time.valueOf("09:15:00"));
-        loginLogoutTimes2.setDate(Date.valueOf("2024-05-09"));
-        loginLogoutTimes2.setEmployeeDetails(employeeDetails1);
-        loginLogoutTimes2.setEntry_id(2);
-
-        loginLogoutTimesList.add(loginLogoutTimes2);
-        employeeLoginLogoutTimesList.add(loginLogoutTimes2);
-        engineeringLoginLogoutTimesList.add(loginLogoutTimes2);
-
-        this.loginLogoutTimes3 = new LoginLogoutTimes();
-        loginLogoutTimes3.setEntryType(EntryType.login);
-        loginLogoutTimes3.setTime(Time.valueOf("09:15:00"));
-        loginLogoutTimes3.setDate(Date.valueOf("2024-05-09"));
-        loginLogoutTimes3.setEmployeeDetails(employeeDetails2);
-        loginLogoutTimes3.setEntry_id(3);
-
-        loginLogoutTimesList.add(loginLogoutTimes3);
-
-        this.loginLogoutTimes4 = new LoginLogoutTimes();
-        loginLogoutTimes4.setEntryType(EntryType.login);
-        loginLogoutTimes4.setTime(Time.valueOf("08:30:00"));
-        loginLogoutTimes4.setDate(Date.valueOf("2024-05-09"));
-        loginLogoutTimes4.setEmployeeDetails(employeeDetails3);
-        loginLogoutTimes4.setEntry_id(4);
-
-        loginLogoutTimesList.add(loginLogoutTimes4);
-        engineeringLoginLogoutTimesList.add(loginLogoutTimes4);
+        this.loginLogoutTimesList = new ArrayList<>(List.of(loginLogoutTimes1, loginLogoutTimes2, loginLogoutTimes3,  loginLogoutTimes4));
+        this.employeeLoginLogoutTimesList = new ArrayList<>(List.of(loginLogoutTimes1, loginLogoutTimes2));
+        this.engineeringLoginLogoutTimesList = new ArrayList<>(List.of(loginLogoutTimes1, loginLogoutTimes2,  loginLogoutTimes4));
     }
 
     @AfterEach
     public void tearDown(){
+        this.employeeDetails1 = null;
         this.loginLogoutTimesList = null;
         this.employeeLoginLogoutTimesList = null;
         this.engineeringLoginLogoutTimesList = null;

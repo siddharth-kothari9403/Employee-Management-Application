@@ -13,6 +13,36 @@ import java.sql.Time;
 @Setter
 public class LoginLogoutTimes {
 
+    public LoginLogoutTimes() {}
+
+    public LoginLogoutTimes(Date date, Time time, EntryType entryType) {
+        this.date = date;
+        this.time = time;
+        this.entryType = entryType;
+    }
+
+    public LoginLogoutTimes(Integer id, Date date, Time time, EntryType entryType) {
+        this.entry_id = id;
+        this.date = date;
+        this.time = time;
+        this.entryType = entryType;
+    }
+
+    public LoginLogoutTimes(Integer id, Date date, Time time, EntryType entryType, EmployeeDetails employeeDetails) {
+        this.entry_id = id;
+        this.date = date;
+        this.time = time;
+        this.entryType = entryType;
+        this.employeeDetails = employeeDetails;
+    }
+
+    public LoginLogoutTimes(Date date, Time time, EntryType entryType, EmployeeDetails employeeDetails) {
+        this.date = date;
+        this.time = time;
+        this.entryType = entryType;
+        this.employeeDetails = employeeDetails;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer entry_id;

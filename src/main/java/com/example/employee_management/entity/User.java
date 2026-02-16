@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -11,6 +13,21 @@ import java.util.Set;
 @Getter
 @Setter
 public class User {
+
+    public User() {}
+
+    public User(String username, String password, Set<Role> roles) {
+        this.username = username;
+        this.password = password;
+        this.roles = roles;
+    }
+
+    public User(Integer id, String username, String password, Set<Role> roles) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.roles = roles;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

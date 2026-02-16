@@ -1,5 +1,4 @@
 from email.mime.application import MIMEApplication
-import mysql.connector
 from mysql.connector import Error
 import pandas as pd
 import smtplib
@@ -12,6 +11,58 @@ from sqlalchemy import create_engine
 import io
 from dotenv import load_dotenv
 import os
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+def convert_to_hours(duration_str):
+    if pd.isna(duration_str): return 0
+    parts = duration_str.split()
+    hours, minutes = 0, 0
+    for part in parts:
+        if 'h' in part:
+            hours = int(part.replace('h', ''))
+        elif 'm' in part:
+            minutes = int(part.replace('m', ''))
+    return hours + (minutes / 60.0)
+
+def plot_daily_work_hours(summary, monday_date, friday_date):
+
+    summary['Hours'] = summary['Work Duration'].apply(convert_to_hours)
+    summary['Full Name'] = summary['First Name'] + ' ' + summary['Last Name']
+
+    # 3. Create the grouped bar chart
+    plt.figure(figsize=(16, 8))
+    sns.barplot(data=summary, x='Full Name', y='Hours', hue='Date')
+
+    # Formatting
+    plt.xticks(rotation=45, ha='right')
+    plt.title(f'Work Duration per Employee by Date ({monday_date} to {friday_date})', fontsize=16)
+    plt.ylabel('Hours Worked', fontsize=12)
+    plt.xlabel('Employee Name', fontsize=12)
+    plt.legend(title='Date', bbox_to_anchor=(1.05, 1), loc='upper left')
+    plt.tight_layout()
+
+    # Save and show
+    plt.savefig('daily_work_duration_plot.png')
+    
+def plot_department_hours(dept_analysis, monday_date, friday_date):
+    plt.figure(figsize=(10, 6))
+    plt.bar(dept_analysis['Department'], dept_analysis['Average Hours'], color='skyblue')
+    plt.xlabel('Department')
+    plt.ylabel('Average Hours')
+    plt.title(f'Average Hours Worked by Department ({monday_date} to {friday_date})')
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.savefig('department_hours.png')
+
+def plot_employee_hours(employee_report, monday_date, friday_date):
+    plt.figure(figsize=(12, 8))
+    employee_report = employee_report.sort_values(by='Employee Total Hours', ascending=False)
+    plt.barh(employee_report['First Name'] + ' ' + employee_report['Last Name'], employee_report['Employee Total Hours'], color='lightgreen')
+    plt.xlabel('Total Hours Worked')
+    plt.title(f'Total Hours Worked by Employee ({monday_date} to {friday_date})')
+    plt.tight_layout()
+    plt.savefig('employee_hours.png')
 
 def generate_report(db_host, db_port, db_name, db_username, db_password, monday_date, friday_date):
     try: 
@@ -60,7 +111,9 @@ def generate_report(db_host, db_port, db_name, db_username, db_password, monday_
         summary.columns = ['First Name', 'Last Name', 'Department', 'Date', 'Login Time', 'Logout Time', 'Duration', 'Duration in Seconds', 'Work Duration']
 
         print(summary)
-        summary.to_csv('daily_report.csv', columns=['First Name', 'Last Name', 'Department', 'Date', 'Work Duration'], index=False)
+        summary.sort_values(by=['Date', 'Department', 'First Name', 'Last Name'], inplace=True)
+        summary = summary[['Date', 'Department', 'First Name', 'Last Name', 'Work Duration', 'Login Time', 'Logout Time', 'Duration', 'Duration in Seconds',]]
+        summary.to_csv('daily_report.csv', columns=['Date', 'Department', 'First Name', 'Last Name', 'Work Duration'], index=False)
 
         dept_analysis = summary.groupby('Department')['Duration in Seconds'].agg(['sum', 'mean', 'count']).reset_index()
         dept_analysis.columns = ['Department', 'Total Seconds', 'Average Seconds', 'Employee Count']
@@ -79,34 +132,35 @@ def generate_report(db_host, db_port, db_name, db_username, db_password, monday_
         employee_report.columns = ['First Name', 'Last Name', 'Department', 'Duration', 'Employee Total Hours']
         
         print(employee_report)
-        employee_report.to_csv('employee_report.csv', index=False)
+        employee_report.to_csv('employee_report.csv', columns=['First Name', 'Last Name', 'Department', 'Employee Total Hours'], index=False)
 
-        return summary[['First Name', 'Last Name', 'Department', 'Date', 'Work Duration']], \
-           dept_analysis[['Department', 'Total Hours', 'Average Hours']], \
-           employee_report[['First Name', 'Last Name', 'Department', 'Employee Total Hours']]
+        plot_daily_work_hours(summary, monday_date, friday_date)
+        plot_department_hours(dept_analysis, monday_date, friday_date)
+        plot_employee_hours(employee_report, monday_date, friday_date)
 
     except Error as e:
         print(f"Error connecting to MySQL: {e}")
         return None, None
     
-def send_email(sender_email, receiver_email, password, indiv_df, dept_df, emp_df):
+def send_email(sender_email, receiver_email, password, files=None):
+
+    indiv_df = pd.read_csv('daily_report.csv')
+    dept_df = pd.read_csv('department_report.csv')
+    emp_df = pd.read_csv('employee_report.csv')
 
     message = MIMEMultipart("alternative")
     message["Subject"] = f"Company Productivity Report: {date.today()}"
     body = "PFA the daily attendance and departmental reports attached as CSV files."
     message.attach(MIMEText(body, "plain"))
 
-    for df, filename in [(indiv_df, "daily_report.csv"), (dept_df, "department_report.csv"), (emp_df, "employee_report.csv")]:
-        # Convert DF to CSV in memory
-        buffer = io.StringIO()
-        df.to_csv(buffer, index=False)
-        buffer.seek(0)
-
-        # Create the attachment object
-        part = MIMEBase("application", "octet-stream")
-        part.set_payload(buffer.getvalue())
-        encoders.encode_base64(part)
-        part.add_header("Content-Disposition", f"attachment; filename={filename}")
+    for f in files or []:
+        with open(f, "rb") as fil:
+            part = MIMEApplication(
+                fil.read(),
+                Name=os.path.basename(f)
+            )
+        # After the file is closed
+        part['Content-Disposition'] = f'attachment; filename={os.path.basename(f)}'
         message.attach(part)
 
     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
@@ -124,6 +178,6 @@ if __name__ == "__main__":
     receiver_email = os.getenv('RECEIVER_EMAIL')
     password = os.getenv('SENDER_PASSWORD')
 
-    daily_report, dept_report, emp_report = generate_report(db_host, db_port, db_name, db_username, db_password, monday_date='2024-05-06', friday_date='2024-05-10')
-    send_email(sender_email, receiver_email, password, daily_report, dept_report, emp_report)
+    generate_report(db_host, db_port, db_name, db_username, db_password, monday_date='2024-05-06', friday_date='2024-05-10')
+    send_email(sender_email, receiver_email, password, files=['daily_report.csv', 'department_report.csv', 'employee_report.csv', 'daily_work_duration_plot.png', 'department_hours.png', 'employee_hours.png'])
     print("Success: Report sent.")

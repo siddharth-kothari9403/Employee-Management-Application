@@ -68,8 +68,7 @@ public class LoginLogoutTimesControllerTest {
     @MockitoBean
     private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
-    @MockitoBean
-    private JwtRequestFilter jwtRequestFilter;
+    private final JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(customUserDetailsService, jwtTokenUtil);
 
     private LoginLogoutTimes loginLogoutTimes1;
     private LoginLogoutTimes loginLogoutTimes2;
@@ -86,77 +85,19 @@ public class LoginLogoutTimesControllerTest {
     @BeforeEach
     public void setup() throws Exception {
 
-        doAnswer(invocation -> {
-            HttpServletRequest request = invocation.getArgument(0);
-            HttpServletResponse response = invocation.getArgument(1);
-            jakarta.servlet.FilterChain chain = invocation.getArgument(2);
-            chain.doFilter(request, response);
-            return null;
-        }).when(jwtRequestFilter).doFilter(any(), any(), any());
+        this.employeeDetails1 = new EmployeeDetails(1, "employee1", null, null, null, null, null, "Engineering");
+        this.employeeDetails2 = new EmployeeDetails(2, "employee2", null, null, null, null, null, "HR");
+        this.employeeDetails3 = new EmployeeDetails(3,  "employee3", null, null, null, null, null, "Engineering");
 
-        this.employeeDetails1 = new EmployeeDetails();
-        this.employeeDetails1.setId(1);
-        this.employeeDetails1.setDepartment("Engineering");
+        this.loginLogoutTimes1 = new LoginLogoutTimes(1, Date.valueOf("2024-05-09"), Time.valueOf("08:45:00"), EntryType.login, employeeDetails1);
+        this.loginLogoutTimes2 = new LoginLogoutTimes(2, Date.valueOf("2024-05-09"), Time.valueOf("09:15:00"), EntryType.logout, employeeDetails1);
+        this.loginLogoutTimes3 = new LoginLogoutTimes(3, Date.valueOf("2024-05-09"), Time.valueOf("09:15:00"), EntryType.login, employeeDetails2);
+        this.loginLogoutTimes4 = new LoginLogoutTimes(4, Date.valueOf("2024-05-09"), Time.valueOf("08:30:00"), EntryType.login, employeeDetails3);
+        this.loginLogoutTimes5 = new LoginLogoutTimes(5, Date.valueOf("2024-05-09"), Time.valueOf("17:45:00"), EntryType.logout, employeeDetails3);
 
-        this.employeeDetails2 = new EmployeeDetails();
-        this.employeeDetails2.setId(2);
-        this.employeeDetails2.setDepartment("HR");
-
-        this.employeeDetails3 = new EmployeeDetails();
-        this.employeeDetails3.setId(3);
-        this.employeeDetails3.setDepartment("Engineering");
-
-        this.loginLogoutTimesList = new ArrayList<>();
-        this.employeeLoginLogoutTimesList = new ArrayList<>();
-        this.engineeringLoginLogoutTimesList = new ArrayList<>();
-
-        this.loginLogoutTimes1 = new LoginLogoutTimes();
-        loginLogoutTimes1.setEntryType(EntryType.login);
-        loginLogoutTimes1.setTime(Time.valueOf("08:45:00"));
-        loginLogoutTimes1.setDate(Date.valueOf("2024-05-09"));
-        loginLogoutTimes1.setEmployeeDetails(employeeDetails1);
-        loginLogoutTimes1.setEntry_id(1);
-
-        loginLogoutTimesList.add(loginLogoutTimes1);
-        employeeLoginLogoutTimesList.add(loginLogoutTimes1);
-        engineeringLoginLogoutTimesList.add(loginLogoutTimes1);
-
-        this.loginLogoutTimes2 = new LoginLogoutTimes();
-        loginLogoutTimes2.setEntryType(EntryType.logout);
-        loginLogoutTimes2.setTime(Time.valueOf("09:15:00"));
-        loginLogoutTimes2.setDate(Date.valueOf("2024-05-09"));
-        loginLogoutTimes2.setEmployeeDetails(employeeDetails1);
-        loginLogoutTimes2.setEntry_id(2);
-
-        loginLogoutTimesList.add(loginLogoutTimes2);
-        employeeLoginLogoutTimesList.add(loginLogoutTimes2);
-        engineeringLoginLogoutTimesList.add(loginLogoutTimes2);
-
-        this.loginLogoutTimes3 = new LoginLogoutTimes();
-        loginLogoutTimes3.setEntryType(EntryType.login);
-        loginLogoutTimes3.setTime(Time.valueOf("09:15:00"));
-        loginLogoutTimes3.setDate(Date.valueOf("2024-05-09"));
-        loginLogoutTimes3.setEmployeeDetails(employeeDetails2);
-        loginLogoutTimes3.setEntry_id(3);
-
-        loginLogoutTimesList.add(loginLogoutTimes3);
-
-        this.loginLogoutTimes4 = new LoginLogoutTimes();
-        loginLogoutTimes4.setEntryType(EntryType.login);
-        loginLogoutTimes4.setTime(Time.valueOf("08:30:00"));
-        loginLogoutTimes4.setDate(Date.valueOf("2024-05-09"));
-        loginLogoutTimes4.setEmployeeDetails(employeeDetails3);
-        loginLogoutTimes4.setEntry_id(4);
-
-        loginLogoutTimesList.add(loginLogoutTimes4);
-        engineeringLoginLogoutTimesList.add(loginLogoutTimes4);
-
-        this.loginLogoutTimes5 = new LoginLogoutTimes();
-        loginLogoutTimes5.setEntryType(EntryType.logout);
-        loginLogoutTimes5.setTime(Time.valueOf("17:45:00"));
-        loginLogoutTimes5.setDate(Date.valueOf("2024-05-09"));
-        loginLogoutTimes5.setEmployeeDetails(employeeDetails3);
-        loginLogoutTimes5.setEntry_id(5);
+        this.loginLogoutTimesList = new ArrayList<>(List.of(loginLogoutTimes1, loginLogoutTimes2, loginLogoutTimes3, loginLogoutTimes4, loginLogoutTimes5));
+        this.employeeLoginLogoutTimesList = new ArrayList<>(List.of(loginLogoutTimes1, loginLogoutTimes2));
+        this.engineeringLoginLogoutTimesList = new ArrayList<>(List.of(loginLogoutTimes1, loginLogoutTimes2, loginLogoutTimes4, loginLogoutTimes5));
     }
 
     @AfterEach
@@ -179,7 +120,7 @@ public class LoginLogoutTimesControllerTest {
         mockMvc.perform(get("/v1/times/")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(4));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(5));
     }
 
     @Test
@@ -189,7 +130,7 @@ public class LoginLogoutTimesControllerTest {
         mockMvc.perform(get("/v1/times/")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(4));
+                .andExpect(jsonPath("$.length()").value(5));
     }
 
     @Test
@@ -339,7 +280,7 @@ public class LoginLogoutTimesControllerTest {
         mockMvc.perform(get("/v1/times/departments?departmentName=Engineering")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(3));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(4));
     }
 
     @Test
@@ -349,7 +290,7 @@ public class LoginLogoutTimesControllerTest {
         mockMvc.perform(get("/v1/times/departments?departmentName=Engineering")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(3));
+                .andExpect(jsonPath("$.length()").value(4));
     }
 
     @Test

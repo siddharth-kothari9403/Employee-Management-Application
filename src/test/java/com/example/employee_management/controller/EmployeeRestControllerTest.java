@@ -22,6 +22,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -67,8 +68,7 @@ public class EmployeeRestControllerTest {
     @MockitoBean
     private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
-    @MockitoBean
-    private JwtRequestFilter jwtRequestFilter;
+    private final JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(customUserDetailsService, jwtTokenUtil);
 
     private User adminUser;
     private User hrUser;
@@ -79,83 +79,32 @@ public class EmployeeRestControllerTest {
     private EmployeeDetails adminEmployeeDetails;
     private EmployeeDetails hrEmployeeDetails;
     private EmployeeDetails normalEmployeeDetails;
-    private List<EmployeeDetails> employeeDetails;
-    private List<EmployeeDetails> engineeringEmployeeDetails;
+    private List<EmployeeDetails> employeeDetailsList;
+    private List<EmployeeDetails> engineeringEmployeeDetailsList;
 
     @BeforeEach
-    public void setup() throws Exception {
+    public void setup() {
 
-        doAnswer(invocation -> {
-            HttpServletRequest request = invocation.getArgument(0);
-            HttpServletResponse response = invocation.getArgument(1);
-            jakarta.servlet.FilterChain chain = invocation.getArgument(2);
-            chain.doFilter(request, response);
-            return null;
-        }).when(jwtRequestFilter).doFilter(any(), any(), any());
+        this.adminRole = new Role("ADMIN");
+        this.adminUser = new User(1, "admin", "test123", Set.of(adminRole));
+        this.adminEmployeeDetails = new EmployeeDetails(1, "test", "test", null, null, null, null, "Admin", adminUser);
 
-        this.employeeDetails = new ArrayList<>();
-        this.engineeringEmployeeDetails = new ArrayList<>();
+        this.hrRole = new Role("HR_MANAGER");
+        this.hrUser = new User(2, "hr", "test123", Set.of(hrRole));
+        this.hrEmployeeDetails = new EmployeeDetails(2, "test", "test", null, null, null, null, "HR", hrUser);
 
-        this.adminRole = new Role();
-        adminRole.setName("ADMIN");
+        this.normalRole = new Role("USER");
+        this.normalUser = new User(3, "user", "test123", Set.of(normalRole));
+        this.normalEmployeeDetails = new EmployeeDetails(3, "test", "test", null, null, null, null, "Engineering", normalUser);
 
-        this.adminUser = new User();
-        adminUser.setUsername("admin");
-        adminUser.setPassword("test123");
-        adminUser.setId(1);
-        adminUser.setRoles(Set.of(adminRole));
-
-        this.adminEmployeeDetails = new EmployeeDetails();
-        adminEmployeeDetails.setId(1);
-        adminEmployeeDetails.setFirstName("test");
-        adminEmployeeDetails.setLastName("test");
-        adminEmployeeDetails.setDepartment("Admin");
-        adminEmployeeDetails.setUser(adminUser);
-
-        employeeDetails.add(adminEmployeeDetails);
-
-        this.hrRole = new Role();
-        hrRole.setName("HR_MANAGER");
-
-        this.hrUser = new User();
-        hrUser.setUsername("hr");
-        hrUser.setPassword("test123");
-        hrUser.setId(2);
-        hrUser.setRoles(Set.of(hrRole));
-
-        this.hrEmployeeDetails = new EmployeeDetails();
-        hrEmployeeDetails.setId(2);
-        hrEmployeeDetails.setFirstName("test");
-        hrEmployeeDetails.setLastName("test");
-        hrEmployeeDetails.setDepartment("HR");
-        hrEmployeeDetails.setUser(hrUser);
-
-        employeeDetails.add(hrEmployeeDetails);
-
-        this.normalRole = new Role();
-        normalRole.setName("USER");
-
-        this.normalUser = new User();
-        normalUser.setUsername("user");
-        normalUser.setPassword("test123");
-        normalUser.setId(3);
-        normalUser.setRoles(Set.of(normalRole));
-
-        this.normalEmployeeDetails = new EmployeeDetails();
-        normalEmployeeDetails.setId(3);
-        normalEmployeeDetails.setFirstName("test");
-        normalEmployeeDetails.setLastName("test");
-        normalEmployeeDetails.setDepartment("Engineering");
-        normalEmployeeDetails.setUser(normalUser);
-
-        employeeDetails.add(normalEmployeeDetails);
-        engineeringEmployeeDetails.add(normalEmployeeDetails);
+        this.employeeDetailsList = new ArrayList<>(List.of(adminEmployeeDetails, hrEmployeeDetails, normalEmployeeDetails));
+        this.engineeringEmployeeDetailsList = new ArrayList<>(List.of(normalEmployeeDetails));
     }
 
     @AfterEach
     public void tearDown(){
-        employeeDetails = null;
-        engineeringEmployeeDetails = null;
+        employeeDetailsList = null;
+        engineeringEmployeeDetailsList = null;
         adminUser = null;
         hrUser = null;
         normalUser = null;
@@ -170,7 +119,7 @@ public class EmployeeRestControllerTest {
     @Test
     @WithMockUser(username = "admin", password = "test123", roles = "ADMIN")
     public void getAllEmployeesWithAdminRoleShouldPass() throws Exception {
-        when(employeeDetailsService.findAll()).thenReturn(employeeDetails);
+        when(employeeDetailsService.findAll()).thenReturn(employeeDetailsList);
         mockMvc.perform(get("/v1/employee/")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -180,7 +129,7 @@ public class EmployeeRestControllerTest {
     @Test
     @WithMockUser(username = "hr", password = "test123", roles = "HR_MANAGER")
     public void getAllEmployeesWithHRManagerRoleShouldPass() throws Exception {
-        when(employeeDetailsService.findAll()).thenReturn(employeeDetails);
+        when(employeeDetailsService.findAll()).thenReturn(employeeDetailsList);
         mockMvc.perform(get("/v1/employee/")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -190,7 +139,7 @@ public class EmployeeRestControllerTest {
     @Test
     @WithMockUser(username = "user", password = "test123", roles = "USER")
     public void getAllEmployeesWithUserRoleShouldFail() throws Exception {
-        when(employeeDetailsService.findAll()).thenReturn(employeeDetails);
+        when(employeeDetailsService.findAll()).thenReturn(employeeDetailsList);
         mockMvc.perform(get("/v1/employee/")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
@@ -199,7 +148,7 @@ public class EmployeeRestControllerTest {
     @Test
     @WithMockUser(username = "admin", password = "test123", roles = "ADMIN")
     public void getEmployeesByDeptWithAdminRoleShouldPass() throws Exception {
-        when(employeeDetailsService.findByDepartment(any())).thenReturn(engineeringEmployeeDetails);
+        when(employeeDetailsService.findByDepartment(any())).thenReturn(engineeringEmployeeDetailsList);
         mockMvc.perform(get("/v1/employee/departments?departmentName=Engineering")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -209,7 +158,7 @@ public class EmployeeRestControllerTest {
     @Test
     @WithMockUser(username = "hr", password = "test123", roles = "HR_MANAGER")
     public void getEmployeesByDeptWithHRManagerRoleShouldPass() throws Exception {
-        when(employeeDetailsService.findByDepartment(any())).thenReturn(engineeringEmployeeDetails);
+        when(employeeDetailsService.findByDepartment(any())).thenReturn(engineeringEmployeeDetailsList);
         mockMvc.perform(get("/v1/employee/departments?departmentName=Engineering")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -219,7 +168,7 @@ public class EmployeeRestControllerTest {
     @Test
     @WithMockUser(username = "user", password = "test123", roles = "USER")
     public void getEmployeesByDeptWithUserRoleShouldFail() throws Exception {
-        when(employeeDetailsService.findAll()).thenReturn(engineeringEmployeeDetails);
+        when(employeeDetailsService.findAll()).thenReturn(engineeringEmployeeDetailsList);
         mockMvc.perform(get("/v1/employee/departments?departmentName=Engineering")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());

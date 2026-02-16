@@ -27,37 +27,17 @@ public class EmployeeDetailsServiceTest {
     private EmployeeDetailsService employeeDetailsService;
 
     private EmployeeDetails employeeDetails1;
-    private List<EmployeeDetails> employeeDetails;
-    private List<EmployeeDetails> engineeringEmployeeDetails;
+    private List<EmployeeDetails> employeeDetailsList;
+    private List<EmployeeDetails> engineeringEmployeeDetailsList;
 
     @BeforeEach
     public void setUp(){
-        this.employeeDetails1 = new EmployeeDetails();
-        employeeDetails1.setId(9);
-        employeeDetails1.setFirstName("John");
-        employeeDetails1.setLastName("Doe");
-        employeeDetails1.setAge(30);
-        employeeDetails1.setGender("M");
-        employeeDetails1.setDepartment("Engineering");
-        employeeDetails1.setEmail("john.doe@company.com");
-        employeeDetails1.setPhoneNo("1234567890");
 
-        EmployeeDetails employeeDetails2 = new EmployeeDetails();
-        employeeDetails2.setId(10);
-        employeeDetails2.setFirstName("Alice");
-        employeeDetails2.setLastName("Baker");
-        employeeDetails2.setAge(40);
-        employeeDetails2.setGender("F");
-        employeeDetails2.setDepartment("HR");
-        employeeDetails2.setEmail("alice.baker@company.com");
-        employeeDetails2.setPhoneNo("9876543210");
+        this.employeeDetails1 = new EmployeeDetails(9, "John", "Doe", 30, "M", "john.doe@company.com", "1234567890", "Engineering");
+        EmployeeDetails employeeDetails2 = new EmployeeDetails(10, "Alice", "Baker", 40, "F", "alice.baker@company.com", "9876543210", "HR");
 
-        this.employeeDetails = new ArrayList<>();
-        employeeDetails.add(employeeDetails1);
-        employeeDetails.add(employeeDetails2);
-
-        this.engineeringEmployeeDetails = new ArrayList<>();
-        engineeringEmployeeDetails.add(employeeDetails1);
+        this.employeeDetailsList = new ArrayList<>(List.of(employeeDetails1, employeeDetails2));
+        this.engineeringEmployeeDetailsList = new ArrayList<>(List.of(employeeDetails1));
     }
 
     @Test
@@ -93,17 +73,17 @@ public class EmployeeDetailsServiceTest {
 
     @Test
     public void returnAllEmployees(){
-        when(employeeRepository.findAll()).thenReturn(employeeDetails);
+        when(employeeRepository.findAll()).thenReturn(employeeDetailsList);
         List<EmployeeDetails> employees1 = employeeDetailsService.findAll();
-        assertThat(employees1).isEqualTo(employeeDetails);
+        assertThat(employees1).isEqualTo(employeeDetailsList);
         verify(employeeRepository,times(1)).findAll();
     }
 
     @Test
     public void returnAllEmployeesByDepartment(){
-        when(employeeRepository.findByDepartment(any())).thenReturn(engineeringEmployeeDetails);
+        when(employeeRepository.findByDepartment(any())).thenReturn(engineeringEmployeeDetailsList);
         List<EmployeeDetails> employees1 = employeeDetailsService.findByDepartment("Engineering");
-        assertThat(employees1).isEqualTo(engineeringEmployeeDetails);
+        assertThat(employees1).isEqualTo(engineeringEmployeeDetailsList);
         verify(employeeRepository,times(1)).findByDepartment(any());
     }
 }

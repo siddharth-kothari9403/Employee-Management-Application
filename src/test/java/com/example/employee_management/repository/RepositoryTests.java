@@ -37,43 +37,19 @@ class RepositoryTests {
     @BeforeEach
     void setUp() {
 
-        adminRole = new Role();
-        adminRole.setName("ADMIN");
-
-        Role hrRole = new Role();
-        hrRole.setName("HR_MANAGER");
-
-        Role userRole = new Role();
-        userRole.setName("USER");
+        this.adminRole = new Role("ADMIN");
+        Role hrRole = new Role("HR_MANAGER");
+        Role userRole = new Role("USER");
 
         entityManager.persist(adminRole);
         entityManager.persist(hrRole);
         entityManager.persist(userRole);
 
-        u1 = new User();
-        u1.setUsername("admin");
-        u1.setPassword("test123");
-        u1.setRoles(Set.of(adminRole));
-
-        User u2 = new User();
-        u2.setUsername("hr");
-        u2.setPassword("test123");
-        u2.setRoles(Set.of(hrRole));
-
-        User u3 = new User();
-        u3.setUsername("john");
-        u3.setPassword("test123");
-        u3.setRoles(Set.of(userRole));
-
-        User u4 = new User();
-        u4.setUsername("alice");
-        u4.setPassword("test123");
-        u4.setRoles(Set.of(userRole));
-
-        User u5 = new User();
-        u5.setUsername("bob");
-        u5.setPassword("test123");
-        u5.setRoles(Set.of(userRole));
+        u1 = new User("admin", "test123", Set.of(adminRole));
+        User u2 = new User("hr", "test123", Set.of(hrRole));
+        User u3 = new User("john", "test123", Set.of(userRole));
+        User u4 = new User("alice", "test123", Set.of(userRole));
+        User u5 = new User("bob", "test123", Set.of(userRole));
 
         entityManager.persist(u1);
         entityManager.persist(u2);
@@ -81,25 +57,11 @@ class RepositoryTests {
         entityManager.persist(u4);
         entityManager.persist(u5);
 
-        e1 = new EmployeeDetails();
-        e1.setFirstName("Admin");
-        e1.setDepartment("Admin");
-
-        EmployeeDetails e2 = new EmployeeDetails();
-        e2.setFirstName("HR");
-        e2.setDepartment("HR");
-
-        EmployeeDetails e3 = new EmployeeDetails();
-        e3.setFirstName("John");
-        e3.setDepartment("Engineering");
-
-        EmployeeDetails e4 = new EmployeeDetails();
-        e4.setFirstName("Alice");
-        e4.setDepartment("Marketing");
-
-        EmployeeDetails e5 = new EmployeeDetails();
-        e5.setFirstName("Bob");
-        e5.setDepartment("Engineering");
+        e1 = new EmployeeDetails("Admin", null, null, null, null, null, "Admin", u1);
+        EmployeeDetails e2 = new EmployeeDetails("HR", null, null, null, null, null, "HR", u2);
+        EmployeeDetails e3 = new EmployeeDetails("John", null, null, null, null, null, "Engineering", u3);
+        EmployeeDetails e4 = new EmployeeDetails("Alice", null, null, null, null, null, "Marketing", u4);
+        EmployeeDetails e5 = new EmployeeDetails("Bob", null, null, null, null, null, "Engineering", u5);
 
         entityManager.persist(e1);
         entityManager.persist(e2);
@@ -107,25 +69,11 @@ class RepositoryTests {
         entityManager.persist(e4);
         entityManager.persist(e5);
 
-        LoginLogoutTimes l1 = new LoginLogoutTimes();
-        l1.setEmployeeDetails(e1);
-        l1.setEntryType(EntryType.login);
-
-        LoginLogoutTimes l2 = new LoginLogoutTimes();
-        l2.setEmployeeDetails(e2);
-        l2.setEntryType(EntryType.login);
-
-        LoginLogoutTimes l3 = new LoginLogoutTimes();
-        l3.setEmployeeDetails(e3);
-        l3.setEntryType(EntryType.login);
-
-        LoginLogoutTimes l4 = new LoginLogoutTimes();
-        l4.setEmployeeDetails(e4);
-        l4.setEntryType(EntryType.login);
-
-        LoginLogoutTimes l5 = new LoginLogoutTimes();
-        l5.setEmployeeDetails(e1);
-        l5.setEntryType(EntryType.logout);
+        LoginLogoutTimes l1 = new LoginLogoutTimes(null, null, EntryType.login, e1);
+        LoginLogoutTimes l2 = new LoginLogoutTimes(null, null, EntryType.login, e2);
+        LoginLogoutTimes l3 = new LoginLogoutTimes(null, null, EntryType.login, e3);
+        LoginLogoutTimes l4 = new LoginLogoutTimes(null, null, EntryType.login, e4);
+        LoginLogoutTimes l5 = new LoginLogoutTimes(null, null, EntryType.logout, e1);
 
         entityManager.persist(l1);
         entityManager.persist(l2);

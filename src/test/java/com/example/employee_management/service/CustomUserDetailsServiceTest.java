@@ -3,6 +3,7 @@ package com.example.employee_management.service;
 import com.example.employee_management.entity.Role;
 import com.example.employee_management.entity.User;
 import com.example.employee_management.exceptions.UserNotFoundException;
+import com.example.employee_management.model.CustomUserDetails;
 import com.example.employee_management.model.UserDTO;
 import com.example.employee_management.repository.RoleRepository;
 import com.example.employee_management.repository.UserRepository;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Optional;
 import java.util.Set;
@@ -21,7 +23,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class UserDetailsServiceTest {
+public class CustomUserDetailsServiceTest {
 
     @Mock
     private UserRepository userRepository;
@@ -45,44 +47,17 @@ public class UserDetailsServiceTest {
     @BeforeEach
     public void setUp() {
 
-        this.adminRole = new Role();
-        adminRole.setName("ADMIN");
+        this.adminRole = new Role("ADMIN");
+        this.adminUser = new User(1, "admin", "test123", Set.of(this.adminRole));
+        this.adminDTO = new UserDTO("admin", "test123");
 
-        this.adminUser = new User();
-        adminUser.setUsername("admin");
-        adminUser.setPassword("test123");
-        adminUser.setId(1);
-        adminUser.setRoles(Set.of(adminRole));
+        this.hrRole = new Role("HR_MANAGER");
+        this.hrUser = new User(2, "hr", "test123", Set.of(this.hrRole));
+        this.hrDTO = new UserDTO("hr",  "test123");
 
-        this.adminDTO = new UserDTO();
-        adminDTO.setUsername("admin");
-        adminDTO.setPassword("test123");
-
-        this.hrRole = new Role();
-        hrRole.setName("HR_MANAGER");
-
-        this.hrUser = new User();
-        hrUser.setUsername("hr");
-        hrUser.setPassword("test123");
-        hrUser.setId(2);
-        hrUser.setRoles(Set.of(hrRole));
-
-        this.hrDTO = new UserDTO();
-        this.hrDTO.setUsername("hr");
-        this.hrDTO.setPassword("test123");
-
-        this.normalRole = new Role();
-        normalRole.setName("USER");
-
-        this.normalUser = new User();
-        normalUser.setUsername("employee");
-        normalUser.setPassword("test123");
-        normalUser.setId(3);
-        normalUser.setRoles(Set.of(normalRole));
-
-        this.normalDTO = new UserDTO();
-        this.normalDTO.setUsername("employee");
-        this.normalDTO.setPassword("test123");
+        this.normalRole = new Role("USER");
+        this.normalUser = new User(3, "employee", "test123", Set.of(this.normalRole));
+        this.normalDTO = new UserDTO("employee", "test123");
     }
 
     @Test

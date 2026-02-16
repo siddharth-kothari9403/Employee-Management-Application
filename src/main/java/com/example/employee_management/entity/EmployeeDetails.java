@@ -10,6 +10,53 @@ import lombok.Setter;
 @Getter
 @Setter
 public class EmployeeDetails {
+
+    public EmployeeDetails() {}
+
+    public EmployeeDetails(String firstName, String lastName, Integer age, String gender, String email, String phoneNumber, String department) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.age = age;
+        this.gender = gender;
+        this.email = email;
+        this.phoneNo = phoneNumber;
+        this.department = department;
+    }
+
+    public EmployeeDetails(Integer id, String firstName, String lastName, Integer age, String gender, String email, String phoneNumber, String department) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.age = age;
+        this.gender = gender;
+        this.email = email;
+        this.phoneNo = phoneNumber;
+        this.department = department;
+    }
+
+    public EmployeeDetails(Integer id, String firstName, String lastName, Integer age, String gender, String email, String phoneNumber, String department, User user) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.age = age;
+        this.gender = gender;
+        this.email = email;
+        this.phoneNo = phoneNumber;
+        this.department = department;
+        this.user = user;
+    }
+
+    public EmployeeDetails(String firstName, String lastName, Integer age, String gender, String email, String phoneNumber, String department, User user) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.age = age;
+        this.gender = gender;
+        this.email = email;
+        this.phoneNo = phoneNumber;
+        this.department = department;
+        this.user = user;
+    }
+
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name = "employee_id")
